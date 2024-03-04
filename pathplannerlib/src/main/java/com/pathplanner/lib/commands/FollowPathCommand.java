@@ -7,6 +7,7 @@ import com.pathplanner.lib.path.PathPlannerTrajectory;
 import com.pathplanner.lib.util.PPLibTelemetry;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -93,6 +94,14 @@ public class FollowPathCommand extends Command {
 
     Pose2d currentPose = poseSupplier.get();
     ChassisSpeeds currentSpeeds = speedsSupplier.get();
+
+    if (!controller.isHolonomic() && path.isReversed()) {
+      currentPose = new Pose2d(
+          currentPose.getTranslation(),
+          currentPose.getRotation().rotateBy(
+              new Rotation2d(Units.Radians.of(Math.PI))
+          ));
+    }
 
     controller.reset(currentPose, currentSpeeds);
 
